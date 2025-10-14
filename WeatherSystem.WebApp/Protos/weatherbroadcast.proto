@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "WeatherSystem.Grpc.Server.Protos";
+package weatherbroadcast;
+
+// Servicedefinition für die Wetterübertragung
+service WeatherBroadcast {
+  // Stream von Wettermessdaten
+  rpc StreamWeatherData (stream WeatherMeasurement) returns (WeatherAcknowledgement);
+  
+  // Abonnieren eines Wetterstreams
+  rpc SubscribeToWeatherUpdates (SubscriptionRequest) returns (stream WeatherMeasurement);
+}
+
+// Eine einzelne Wettermessung
+message WeatherMeasurement {
+  string timestamp = 1;
+  string dayPhase = 2;    // DAY oder NIGHT
+  double temperature = 3;
+  double humidity = 4;
+  double pressure = 5;
+  bool isRaining = 6;
+}
+
+// Anfrage für ein Wetterabonnement
+message SubscriptionRequest {
+  string clientId = 1;
+}
+
+// Bestätigung für empfangene Daten
+message WeatherAcknowledgement {
+  bool success = 1;
+  string message = 2;
+}

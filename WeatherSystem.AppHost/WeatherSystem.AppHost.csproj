@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>725a5a2e-5104-4e92-b9a0-5213d87ed609</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WeatherSystem.Node\WeatherSystem.Node.csproj" />
+    <ProjectReference Include="..\WeatherSystem.Simulator\WeatherSystem.Simulator.csproj" />
+    <ProjectReference Include="..\WeatherSystem.WebApp\WeatherSystem.WebApp.csproj" />
+  </ItemGroup>
+
+</Project>

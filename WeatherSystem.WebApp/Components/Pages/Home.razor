@@ -1,0 +1,225 @@
+﻿@page "/"
+@page "/weather"
+@using WeatherSystem.WebApp.Models
+@using WeatherSystem.WebApp.Services
+@inject IWeatherDataCollectionService WeatherDataService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<PageTitle>Weather Dashboard</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-center text-primary">
+                <i class="bi bi-cloud-sun"></i> Weather System Dashboard
+            </h1>
+            <p class="text-center text-muted">Real-time weather data from all sensor nodes</p>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> System Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Total Nodes</h6>
+                                <span class="badge bg-primary fs-6">@weatherData.Count()</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Connected</h6>
+                                <span class="badge bg-success fs-6">@weatherData.Count(w => w.IsConnected)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Disconnected</h6>
+                                <span class="badge bg-danger fs-6">@weatherData.Count(w => !w.IsConnected)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h6>Last Update</h6>
+                                <small class="text-muted">@DateTime.Now.ToString("HH:mm:ss")</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var nodeData in weatherData.OrderBy(w => w.NodeName))
+        {
+            <div class="col-lg-6 col-xl-3 mb-4">
+                <div class="card h-100 @(nodeData.IsConnected ? "border-success" : "border-danger")">
+                    <div class="card-header @(nodeData.IsConnected ? "bg-success" : "bg-danger") text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="bi @(nodeData.IsConnected ? "bi-wifi" : "bi-wifi-off")"></i>
+                                @nodeData.NodeName
+                            </h6>
+                            <span class="badge @(nodeData.IsConnected ? "bg-light text-success" : "bg-light text-danger")">
+                                @nodeData.ConnectionStatus
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (nodeData.IsConnected  && !string.IsNullOrEmpty(nodeData.Timestamp))
+                        {
+                            <div class="weather-data">
+                                <!-- Day Phase -->
+                                <div class="mb-3 text-center">
+                                    <span class="badge @(nodeData.DayPhase == "DAY" ? "bg-warning text-dark" : "bg-dark text-light") fs-6">
+                                        <i class="bi @(nodeData.DayPhase == "DAY" ? "bi-sun" : "bi-moon")"></i>
+                                        @nodeData.DayPhase
+                                    </span>
+                                </div>
+
+                                <!-- Temperature -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-thermometer-half text-danger"></i> Temperature:</span>
+                                        <strong class="@GetTemperatureClass(nodeData.Temperature)">
+                                            @nodeData.Temperature.ToString("F1")°C
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <!-- Humidity -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-droplet text-info"></i> Humidity:</span>
+                                        <strong class="text-info">@nodeData.Humidity.ToString("F1")%</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Pressure -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-speedometer text-secondary"></i> Pressure:</span>
+                                        <strong class="text-secondary">@nodeData.Pressure.ToString("F1") hPa</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Rain Status -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><i class="bi @(nodeData.IsRaining ? "bi-cloud-rain" : "bi-cloud") @(nodeData.IsRaining ? "text-primary" : "text-muted")"></i> Rain:</span>
+                                        <span class="badge @(nodeData.IsRaining ? "bg-primary" : "bg-secondary")">
+                                            @(nodeData.IsRaining ? "Yes" : "No")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Timestamp -->
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> @nodeData.Timestamp
+                                    </small>
+                                </div>
+
+                                <!-- Last Updated -->
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-arrow-clockwise"></i> Updated: @nodeData.LastUpdated.ToString("HH:mm:ss")
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="bi bi-exclamation-triangle fs-1 mb-3"></i>
+                                <p class="mb-0">No data available</p>
+                                <small>@nodeData.ConnectionStatus</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!weatherData.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading weather data...</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .weather-data {
+        font-size: 0.95rem;
+    }
+    
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge {
+        font-size: 0.8rem;
+    }
+</style>
+
+@code {
+    private List<WeatherNodeData> weatherData = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to data updates
+        WeatherDataService.OnDataUpdated += OnDataUpdated;
+        
+        // Load initial data
+        await RefreshData();
+    }
+
+    private async void OnDataUpdated()
+    {
+        await RefreshData();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task RefreshData()
+    {
+        weatherData = WeatherDataService.GetAllWeatherData().ToList();
+        await Task.CompletedTask;
+    }
+
+    private string GetTemperatureClass(double temperature)
+    {
+        return temperature switch
+        {
+            > 25 => "text-danger", // Hot
+            < 10 => "text-info",   // Cold
+            _ => "text-warning"    // Moderate
+        };
+    }
+
+    public void Dispose()
+    {
+        WeatherDataService.OnDataUpdated -= OnDataUpdated;
+    }
+}

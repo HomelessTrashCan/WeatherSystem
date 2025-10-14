@@ -1,0 +1,110 @@
+name: CI/CD Pipeline
+
+# This pipeline builds production containers and runs tests
+# For local development, use .NET Aspire: dotnet run --project WeatherSystem.AppHost
+
+on:
+  push:
+    branches: [ main, develop, prototypv1 ]
+  pull_request:
+    branches: [ main, develop, prototypv1 ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+      
+    - name: Test Aspire orchestration
+      run: |
+        echo "Testing Aspire AppHost compilation..."
+        dotnet build WeatherSystem.AppHost --no-restore --configuration Release
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/TestResults/**/*.xml'
+
+  build-and-push:
+    name: Build and Push Container Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    strategy:
+      matrix:
+        project: 
+          - WeatherSystem.WebApp
+          - WeatherSystem.Node
+          - WeatherSystem.Simulator
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.project }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ${{ matrix.project }}/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: Deploy to Environment
+    runs-on: ubuntu-latest
+    needs: [test, build-and-push]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Deploy Notification
+      run: |
+        echo "?? Deployment ready for main branch"
+        echo "Container images have been built and pushed to registry"
+        echo "Ready for deployment to production environment"

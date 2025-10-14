@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+option csharp_namespace = "WeatherSystem.Grpc.Server.Protos";
+
+package WeatherBroadcast;
+
+service WeatherBroadcast {
+  // Stream weather data from simulators to the server
+  rpc StreamWeatherData(stream WeatherMeasurement) returns (WeatherAcknowledgement);
+  
+  // Stream weather updates from server to clients
+  rpc SubscribeToWeatherUpdates(SubscriptionRequest) returns (stream WeatherMeasurement);
+  
+  // Health check method for clients to verify server status
+  rpc CheckHealth(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message WeatherMeasurement {
+  string timestamp = 1;
+  string day_phase = 2;
+  double temperature = 3;
+  double humidity = 4;
+  double pressure = 5;
+  bool is_raining = 6;
+}
+
+message WeatherAcknowledgement {
+  bool success = 1;
+  string message = 2;
+}
+
+message SubscriptionRequest {
+  string client_id = 1;
+}
+
+// Health check messages
+message HealthCheckRequest {
+  // Optional: You can add parameters if needed in the future
+}
+
+message HealthCheckResponse {
+  bool status = 1;
+  string message = 2;
+}syntax = "proto3";
+
+option csharp_namespace = "WeatherSystem.Grpc.Server.Protos";
+
+package WeatherBroadcast;
+
+service WeatherBroadcast {
+  // Stream weather data from simulators to the server
+  rpc StreamWeatherData(stream WeatherMeasurement) returns (WeatherAcknowledgement);
+  
+  // Stream weather updates from server to clients
+  rpc SubscribeToWeatherUpdates(SubscriptionRequest) returns (stream WeatherMeasurement);
+  
+  // Health check method for clients to verify server status
+  rpc CheckHealth(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message WeatherMeasurement {
+  string timestamp = 1;
+  string day_phase = 2;
+  double temperature = 3;
+  double humidity = 4;
+  double pressure = 5;
+  bool is_raining = 6;
+}
+
+message WeatherAcknowledgement {
+  bool success = 1;
+  string message = 2;
+}
+
+message SubscriptionRequest {
+  string client_id = 1;
+}
+
+// Health check messages
+message HealthCheckRequest {
+  // Optional: You can add parameters if needed in the future
+}
+
+message HealthCheckResponse {
+  bool status = 1;
+  string message = 2;
+}syntax = "proto3";
+
+option csharp_namespace = "WeatherSystem.Grpc.Server.Protos";
+
+package WeatherBroadcast;
+
+service WeatherBroadcast {
+  // Stream weather data from simulators to the server
+  rpc StreamWeatherData(stream WeatherMeasurement) returns (WeatherAcknowledgement);
+  
+  // Stream weather updates from server to clients
+  rpc SubscribeToWeatherUpdates(SubscriptionRequest) returns (stream WeatherMeasurement);
+  
+  // Health check method for clients to verify server status
+  rpc CheckHealth(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message WeatherMeasurement {
+  string timestamp = 1;
+  string day_phase = 2;
+  double temperature = 3;
+  double humidity = 4;
+  double pressure = 5;
+  bool is_raining = 6;
+}
+
+message WeatherAcknowledgement {
+  bool success = 1;
+  string message = 2;
+}
+
+message SubscriptionRequest {
+  string client_id = 1;
+}
+
+// Health check messages
+message HealthCheckRequest {
+  // Optional: You can add parameters if needed in the future
+}
+
+message HealthCheckResponse {
+  bool status = 1;
+  string message = 2;
+}
