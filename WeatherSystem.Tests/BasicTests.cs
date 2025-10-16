@@ -23,7 +23,7 @@ public class BasicTests
         Assert.True(true, "DomainCore project is accessible");
     }
 
-    //DummyTest
+    //DummyTests
     [Fact]
     public void ApplicationCore_ShouldBeAccessible()
     {
