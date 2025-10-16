@@ -22,6 +22,8 @@ namespace WeatherSystem.Node.Services
         // Letzte empfangene Messung für neue Abonnenten
         private static WeatherMeasurement _lastMeasurement;
 
+
+        //logger hinzufügen
         public WeatherBroadcastService(
             ILogger<WeatherBroadcastService> logger,
             IOptions<DisplayOptions> displayOptions,
