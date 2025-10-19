@@ -22,6 +22,8 @@ namespace WeatherSystem.Node.Services
         // Letzte empfangene Messung für neue Abonnenten
         private static WeatherMeasurement _lastMeasurement;
 
+
+        //logger hinzufügen
         public WeatherBroadcastService(
             ILogger<WeatherBroadcastService> logger,
             IOptions<DisplayOptions> displayOptions,
@@ -158,7 +160,17 @@ namespace WeatherSystem.Node.Services
             // Falls verfügbar, sofort die letzte Messung senden
             if (_lastMeasurement != null)
             {
-                await responseStream.WriteAsync(_lastMeasurement);
+                try
+                {
+                    await responseStream.WriteAsync(_lastMeasurement);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    _logger.LogWarning(ex, "Client {ClientId} hat die Verbindung bereits getrennt", clientId);
+                    // Client sofort entfernen, da keine Verbindung mehr besteht
+                    _subscribers.TryRemove(clientId, out _);
+                    return; // Methode beenden, da keine Verbindung mehr besteht
+                }
             }
 
             try

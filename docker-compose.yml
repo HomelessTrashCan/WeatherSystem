@@ -1,0 +1,58 @@
+
+
+services:
+  webapp:
+    image: ${REGISTRY:-ghcr.io/homelesstrashcan/weathersystem}/weathersystem.webapp:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: WeatherSystem.WebApp/Dockerfile
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - WeatherNode__Url=http://node:8080
+    depends_on:
+      - node
+    networks:
+      - weathernet
+
+  node:
+    image: ${REGISTRY:-ghcr.io/homelesstrashcan/weathersystem}/weathersystem.node:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: WeatherSystem.Node/Dockerfile
+    ports:
+      - "5010:8080"
+      - "5011:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - NodeSettings__NodeName=Docker-Node
+      - NodeSettings__DatabasePath=/app/data
+    volumes:
+      - weather-data:/app/data
+    networks:
+      - weathernet
+
+  simulator:
+    image: ${REGISTRY:-ghcr.io/homelesstrashcan/weathersystem}/weathersystem.simulator:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: WeatherSystem.Simulator/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - WeatherPublisher__GrpcServiceUrl=http://node:8080
+      - WeatherPublisher__SimulatorId=Docker-Simulator
+    depends_on:
+      - node
+    networks:
+      - weathernet
+
+networks:
+  weathernet:
+    driver: bridge
+
+volumes:
+  weather-data:

@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 # This pipeline builds production containers and runs tests
 # For local development, use .NET Aspire: dotnet run --project WeatherSystem.AppHost
-
+#test
 on:
   push:
     branches: [ main, develop, prototypv1 ]
@@ -74,7 +74,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.GTHTK }}
         
     - name: Extract metadata
       id: meta
