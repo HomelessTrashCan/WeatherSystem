@@ -22,7 +22,7 @@ Ein Worker Service, der die Wettersimulation ausführt und Daten an den gRPC-Ser
 •	Sendet Daten über den GrpcWeatherPublisher an den Server
 •	Simuliert Tag/Nacht-Zyklen mit dem WeatherStationTimeProvider
 Konfigurationsmöglichkeiten über appsettings.json:
-
+```
 {
   "WeatherPublisher": {
     "GrpcServiceUrl": "http://localhost:5043",
@@ -33,7 +33,7 @@ Konfigurationsmöglichkeiten über appsettings.json:
     "SimulationSpeedFactor": 10
   }
 }
-
+```
 ## 3. WeatherSystem.Grpc.Server
 Der zentrale Server, der Wetterdaten empfängt und an Clients verteilt:
 •	Implementiert den in weatherbroadcast.proto definierten gRPC-Service
@@ -93,13 +93,13 @@ Dies startet:
 ### Komponenten einzeln starten
 Alternativ können die Komponenten auch einzeln gestartet werden:
 1.	Zuerst den gRPC-Server:
-dotnet run --project WeatherSystem.Grpc.Server/WeatherSystem.Grpc.Server.csproj
+```dotnet run --project WeatherSystem.Grpc.Server/WeatherSystem.Grpc.Server.csproj```
 2. 	Dann den Simulator:
-dotnet run --project WeatherSystem.Simulator/WeatherSystem.Simulator.csproj
+```dotnet run --project WeatherSystem.Simulator/WeatherSystem.Simulator.csproj```
 3. Danach die Konsolen-Clients:
 dotnet run --project WeatherSystem.Client/WeatherSystem.Client.csproj
 4.	Die Blazor-Webanwendung:
-dotnet run --project WeatherSystem.WebApp/WeatherSystem.WebApp.csproj
+```dotnet run --project WeatherSystem.WebApp/WeatherSystem.WebApp.csproj```
 
 ## Konfiguration
 Jede Komponente kann über ihre appsettings.json-Datei konfiguriert werden. Die wichtigsten Einstellungen sind:
