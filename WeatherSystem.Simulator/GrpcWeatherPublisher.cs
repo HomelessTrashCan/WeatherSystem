@@ -10,8 +10,8 @@ namespace WeatherSystem.Simulator
 {
     public class GrpcWeatherPublisher
     {
-        private readonly WeatherPublisherOptions _options;
-        private readonly Action<string> _logAction;
+        protected readonly WeatherPublisherOptions _options;
+        protected readonly Action<string> _logAction;
 
         public GrpcWeatherPublisher(IOptions<WeatherPublisherOptions> options, Action<string>? logAction = null)
         {
